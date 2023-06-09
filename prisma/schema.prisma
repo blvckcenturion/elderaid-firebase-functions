@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Benefactor {
+  id          Int    @id @default(autoincrement())
+  name        String
+  CI          String @unique
+  lat         Float?
+  lng         Float?
+  phone       String
+  email       String @unique
+  firebase_id String
+
+  @@index([name])
+}
+
+model Campaign {
+  id               Int      @id @default(autoincrement())
+  institution_id   Int
+  name             String
+  requirement      String
+  beneficiary_type String
+  start_date       DateTime
+  end_date         DateTime
+
+  @@index([institution_id])
+  @@index([name])
+}
+
+model CampaignImage {
+  id          Int    @id @default(autoincrement())
+  campaign_id Int
+  image_url   String
+
+  @@index([campaign_id])
+}
+
+model Donation {
+  id             Int             @id @default(autoincrement())
+  campaign_id    Int
+  benefactor_id  Int
+  description    String
+  quantity       Int
+  donation_date  DateTime
+  status         Donation_status
+  anonymous      Boolean         @default(false)
+  firebase_id    String
+  institution_id Int
+
+  @@index([benefactor_id, status])
+  @@index([campaign_id])
+}
+
+model Institution {
+  id                  Int     @id @default(autoincrement())
+  name                String
+  NIT                 String  @unique
+  main_representative String
+  email               String  @unique
+  phone               String
+  address             String
+  lat                 Float?
+  lng                 Float?
+  password            String
+  image_url           String
+  cellphone           String?
+
+  @@index([name])
+}
+
+enum Donation_status {
+  to_collect
+  on_the_way
+  received
+}
